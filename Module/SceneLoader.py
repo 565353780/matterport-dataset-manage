@@ -13,28 +13,35 @@ from Data.Color import COLOR_MAP
 class SceneLoader(object):
     def __init__(self):
         self.scene_root_folder_path = None
+        self.scene_id = None
         return
 
-    def setSceneRootFolderPath(self, scene_root_folder_path):
+    def setScenePath(self,
+                     scene_root_folder_path,
+                     scene_id):
         if not os.path.exists(scene_root_folder_path):
-            print("[ERROR][SceneLoader::setSceneRootFolderPath]")
+            print("[ERROR][SceneLoader::setScenePath]")
             print("\t scene_root_folder_path not exist!")
             return False
 
         self.scene_root_folder_path = scene_root_folder_path
         if self.scene_root_folder_path[-1] != "/":
             self.scene_root_folder_path += "/"
+
+        self.scene_id = scene_id
         return True
 
-    def loadScene(self, scene_root_folder_path):
-        if not self.setSceneRootFolderPath(scene_root_folder_path):
+    def loadScene(self,
+                  scene_root_folder_path,
+                  scene_id):
+        if not self.setScenePath(scene_root_folder_path,
+                                 scene_id):
             print("[ERROR][SceneLoader::loadScene]")
-            print("\t setSceneRootFolderPath failed!")
+            print("\t setScenePath failed!")
             return False
         return True
 
     def run_demo(self):
-
         matterport_foldername = None
         scene_pointcloud_folder_filename_list = os.listdir(scene_pointcloud_folder_path)
         for scene_pointcloud_folder_filename in scene_pointcloud_folder_filename_list:
@@ -109,9 +116,11 @@ class SceneLoader(object):
 
 def demo():
     scene_root_folder_path = "/home/chli/.ros/COSCAN/MatterPort/01/ARNzJeq3xxb/"
+    scene_id = "ARNzJeq3xxb"
 
     scene_loader = SceneLoader()
-    scene_loader.loadScene(scene_root_folder_path)
+    scene_loader.loadScene(scene_root_folder_path,
+                           scene_id)
     return True
 
 if __name__ == "__main__":
