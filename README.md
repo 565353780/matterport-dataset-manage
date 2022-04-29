@@ -11,6 +11,7 @@ pip install numpy plyfile open3d tqdm
 ## Run
 
 ```bash
+conda activate ply
 python get_object.py
 ```
 
