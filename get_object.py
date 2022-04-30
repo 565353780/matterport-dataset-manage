@@ -1,7 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from Module.SceneLoader import demo
+from Module.RegionLoader import demo
+#  from Module.SceneLoader import demo
 from Module.DatasetLoader import DatasetLoader
 
 if __name__ == "__main__":
