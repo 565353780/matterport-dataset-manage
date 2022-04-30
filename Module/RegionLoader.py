@@ -52,18 +52,14 @@ class RegionLoader(object):
         region_ply_file_path = region_file_basepath + ".ply"
         plydata = PlyData.read(region_ply_file_path)
 
-        print("[INFO][RegionLoader::loadRegionObject]")
-        print("\t start loading vertex...")
         vertex_list = []
-        for vertex in tqdm(plydata['vertex']):
+        for vertex in plydata['vertex']:
             vertex_list.append([vertex['x'], vertex['y'], vertex['z']])
         vertex_array = np.array(vertex_list)
 
-        print("[INFO][RegionLoader::loadRegionObject]")
-        print("\t start loading vertex_category...")
         vertex_category_array = np.zeros(vertex_array.shape)
         vertex_category_array[:] = -1
-        for face in tqdm(plydata['face']):
+        for face in plydata['face']:
             vertex_index_array = np.array(face['vertex_indices'])
             catrgory_id = face['category_id']
             vertex_category_array[vertex_index_array] = catrgory_id
@@ -98,14 +94,9 @@ class RegionLoader(object):
         return True
 
     def loadAllRegionObject(self):
-        for i in range(len(self.region_file_basename_list)):
-            region_file_basename = self.region_file_basename_list[i]
-
-            print("[INFO][RegionLoader::loadAllRegionObject]")
-            print("\t start loading objects in " + \
-                  region_file_basename + " : " +
-                  str(i+1) + "/" + str(len(self.region_file_basename_list)) +
-                  " ...")
+        print("[INFO][RegionLoader::loadAllRegionObject]")
+        print("\t start loading objects in all regions...")
+        for region_file_basename in tqdm(self.region_file_basename_list):
             if not self.loadRegionObject(region_file_basename):
                 print("[ERROR][RegionLoader::loadAllRegionObject]")
                 print("\t loadRegionObject failed!")
