@@ -15,7 +15,6 @@ class RegionLoader(object):
         self.region_folder_path = None
 
         self.region_file_basename_list = []
-
         self.region_object_array_list_dict = {}
         return
 

@@ -10,18 +10,16 @@ from plyfile import PlyData
 
 from Data.Color import COLOR_MAP
 
+from Module.RegionLoader import RegionLoader
+
 class SceneLoader(object):
     def __init__(self):
         self.scene_root_folder_path = None
 
         self.scene_id = None
-
         self.house_segmentations_folder_path = None
 
-        self.region_segmentations_folder_path = None
-        self.region_file_basename_list = []
-
-        self.region_object_dict = {}
+        self.region_loader = RegionLoader()
         return
 
     def updateSceneID(self):
@@ -62,21 +60,26 @@ class SceneLoader(object):
             print("[ERROR][SceneLoader::loadScene]")
             print("\t setScenePath failed!")
             return False
+
+        if not self.region_loader.setRegionPath(
+            self.scene_root_folder_path + "region_segmentations/"):
+            print("[ERROR][SceneLoader::loadScene]")
+            print("\t setRegionPath failed!")
+            return False
         return True
 
-    def visualRegionObject(self, region_file_basename):
-        pcd = o3d.geometry.PointCloud()
-        points = np.concatenate(
-            [object_vertex_array for object_vertex_array in object_vertex_array_list])
-        colors = np.concatenate(
-            [[COLOR_MAP[i]/255.0 for _ in range(len(object_vertex_array_list[i]))] for i in range(len(object_vertex_array_list))])
-        pcd.points = o3d.utility.Vector3dVector(points)
-        pcd.colors = o3d.utility.Vector3dVector(colors)
-
-        o3d.visualization.draw_geometries([pcd])
+    def loadSceneObject(self):
+        if not self.region_loader.loadAllRegionObject():
+            print("[ERROR][SceneLoader::loadSceneObject]")
+            print("\t loadAllRegionObject failed!")
+            return False
         return True
 
     def visualSceneObject(self):
+        if not self.region_loader.visualAllRegionObject():
+            print("[ERROR][SceneLoader::visualSceneObject]")
+            print("\t visualAllRegionObject failed!")
+            return False
         return True
 
 def demo():
@@ -84,6 +87,8 @@ def demo():
 
     scene_loader = SceneLoader()
     scene_loader.loadScene(scene_root_folder_path)
+    scene_loader.loadSceneObject()
+    scene_loader.visualSceneObject()
     return True
 
 if __name__ == "__main__":
