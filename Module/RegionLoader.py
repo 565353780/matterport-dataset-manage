@@ -9,13 +9,16 @@ from tqdm import tqdm
 from plyfile import PlyData
 
 from Data.Color import COLOR_MAP
+from Data.Object import Object
+
+from Method.ObjectToPointCloud import getObjectPointCloud
 
 class RegionLoader(object):
     def __init__(self):
         self.region_folder_path = None
 
         self.region_file_basename_list = []
-        self.region_object_array_list_dict = {}
+        self.region_object_list_dict = {}
         return
 
     def updateRegionFileBasenameList(self):
@@ -46,6 +49,7 @@ class RegionLoader(object):
         return True
 
     def loadRegionObject(self, region_file_basename):
+        self.region_object_list_dict[region_file_basename] = []
         region_file_basepath = \
             self.region_folder_path + region_file_basename
 
@@ -74,23 +78,18 @@ class RegionLoader(object):
         semseg_json = None
         with open(semseg_file_path, "r") as f:
             semseg_json = json.load(f)
-        object_seg_array_list = []
         for seg_group in semseg_json["segGroups"]:
-            object_seg_array_list.append(np.array(seg_group["segments"]))
+            object_label = seg_group["label"]
 
-        object_vertex_idx_array_list = []
-        for object_seg_array in object_seg_array_list:
-            object_vertex_array = \
+            object_seg_array = np.array(seg_group["segments"])
+            object_vertex_idx_array = \
                 np.where(np.isin(vertex_seg_array, object_seg_array) == True)
-            object_vertex_idx_array_list.append(object_vertex_array)
+            object_vertex_array = vertex_array[object_vertex_idx_array]
 
-        object_vertex_array_list = []
-        for object_vertex_idx_array in object_vertex_idx_array_list:
-            object_vertex_array_list.append(
-                vertex_array[object_vertex_idx_array])
-
-        self.region_object_array_list_dict[region_file_basename] = \
-            object_vertex_array_list
+            new_object = Object()
+            new_object.label = object_label
+            new_object.point_array = object_vertex_array
+            self.region_object_list_dict[region_file_basename].append(new_object)
         return True
 
     def loadAllRegionObject(self):
@@ -104,60 +103,43 @@ class RegionLoader(object):
         return True
 
     def visualRegionObject(self, region_file_basename):
-        region_object_vertex_array_list = \
-            self.region_object_array_list_dict[region_file_basename]
+        region_object_list = \
+            self.region_object_list_dict[region_file_basename]
 
-        region_pointcloud = o3d.geometry.PointCloud()
-        points = np.concatenate(
-            [
-                object_vertex_array for
-                object_vertex_array in
-                region_object_vertex_array_list
-            ])
-        colors = np.concatenate(
-            [
-                [
-                    COLOR_MAP[i%40]/255.0 for
-                    _ in
-                    range(len(region_object_vertex_array_list[i]))
-                ] for
-                i in
-                range(len(region_object_vertex_array_list))
-            ])
-        region_pointcloud.points = o3d.utility.Vector3dVector(points)
-        region_pointcloud.colors = o3d.utility.Vector3dVector(colors)
+        region_pointcloud_list = []
+        tmp_idx_ = 0
+        for region_object in region_object_list:
+            tmp_idx_ += 1
+            region_pointcloud = getObjectPointCloud(region_object_list)
+            colors = np.zeros(region_object.point_array.shape)
+            colors[:] = COLOR_MAP[tmp_idx_%40]/255.0
+            region_pointcloud.colors = o3d.utility.Vector3dVector(colors)
+            region_pointcloud_list.append(region_pointcloud)
 
-        o3d.visualization.draw_geometries([region_pointcloud])
+        o3d.visualization.draw_geometries(region_pointcloud_list)
         return True
 
     def visualAllRegionObject(self):
+        unused_object_label_list = [
+            "floor", "wall"
+        ]
+
         region_pointcloud_list = []
 
         for region_file_basename in self.region_file_basename_list:
-            region_object_vertex_array_list = \
-                self.region_object_array_list_dict[region_file_basename]
+            region_object_list = \
+                self.region_object_list_dict[region_file_basename]
 
-            region_pointcloud = o3d.geometry.PointCloud()
-            points = np.concatenate(
-                [
-                    object_vertex_array for
-                    object_vertex_array in
-                    region_object_vertex_array_list
-                ])
-            colors = np.concatenate(
-                [
-                    [
-                        COLOR_MAP[i%40]/255.0 for
-                        _ in
-                        range(len(region_object_vertex_array_list[i]))
-                    ] for
-                    i in
-                    range(len(region_object_vertex_array_list))
-                ])
-            region_pointcloud.points = o3d.utility.Vector3dVector(points)
-            region_pointcloud.colors = o3d.utility.Vector3dVector(colors)
-
-            region_pointcloud_list.append(region_pointcloud)
+            tmp_idx_ = 0
+            for region_object in region_object_list:
+                if region_object.label in unused_object_label_list:
+                    continue
+                tmp_idx_ += 1
+                region_pointcloud = getObjectPointCloud(region_object)
+                colors = np.zeros(region_object.point_array.shape)
+                colors[:] = COLOR_MAP[tmp_idx_%40]/255.0
+                region_pointcloud.colors = o3d.utility.Vector3dVector(colors)
+                region_pointcloud_list.append(region_pointcloud)
 
         o3d.visualization.draw_geometries(region_pointcloud_list)
         return True
