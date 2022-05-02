@@ -5,7 +5,7 @@ import json
 import numpy as np
 from plyfile import PlyData
 
-from Data.object import Object
+from Data.object import RegionObject
 
 def getRegionObjectList(region_file_basepath):
     region_object_list = []
@@ -20,13 +20,6 @@ def getRegionObjectList(region_file_basepath):
         color_list.append([vertex['red'], vertex['green'], vertex['blue']])
     point_array = np.array(point_list)
     color_array = np.array(color_list) / 255.0
-
-    point_category_array = np.zeros(point_array.shape)
-    point_category_array[:] = -1
-    for face in plydata['face']:
-        point_idx_array = np.array(face['vertex_indices'])
-        catrgory_id = face['category_id']
-        point_category_array[point_idx_array] = catrgory_id
 
     region_vsegs_file_path = region_file_basepath + ".vsegs.json"
     vsegs_json = None
@@ -47,10 +40,10 @@ def getRegionObjectList(region_file_basepath):
         object_point_array = point_array[object_point_idx_array]
         object_color_array = color_array[object_point_idx_array]
 
-        new_object = Object()
-        new_object.label = object_label
-        new_object.point_array = object_point_array
-        new_object.color_array = object_color_array
-        region_object_list.append(new_object)
+        new_region_object = RegionObject()
+        new_region_object.label = object_label
+        new_region_object.point_array = object_point_array
+        new_region_object.color_array = object_color_array
+        region_object_list.append(new_region_object)
     return region_object_list
 

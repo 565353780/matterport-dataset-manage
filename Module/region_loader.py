@@ -86,7 +86,8 @@ class RegionLoader(object):
         unused_object_label_list = [
             "floor", "ceiling", "roof", "wall", "window",
             "door", "gate", "object", "unknown", "remove",
-            "ledge", "countertop"
+            "ledge", "countertop", "fence", "concrete block",
+            "kitchen cabinet"
         ]
         for unused_object_label in unused_object_label_list:
             if unused_object_label in label:
@@ -109,6 +110,8 @@ class RegionLoader(object):
 
         for i in range(len(region_pointcloud_list)):
             region_pointcloud_label = region_object_list[i].label
+            if not self.isLabelValid(region_pointcloud_label):
+                continue
             region_pointcloud = region_pointcloud_list[i]
             region_pointcloud_save_filename = region_file_basename + "_" + \
                 str(i) + "_" + region_pointcloud_label + ".ply"
@@ -197,7 +200,7 @@ def demo():
     region_loader = RegionLoader()
     region_loader.setRegionPath(region_folder_path)
     region_loader.loadAllRegionObjectWithPool(processes)
-    region_loader.saveAllRegionObjectPointCloud(save_folder_path)
+    #  region_loader.saveAllRegionObjectPointCloud(save_folder_path)
     region_loader.visualAllRegionObject(use_color_map)
     return True
 
