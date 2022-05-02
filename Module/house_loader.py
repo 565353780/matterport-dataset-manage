@@ -114,6 +114,10 @@ class HouseLoader(object):
 
         merge_pointcloud = getMergePointCloud(house_pointcloud_list)
 
+        merge_pointcloud.estimate_normals(
+            search_param=o3d.geometry.KDTreeSearchParamHybrid(
+                radius=0.1, max_nn=30))
+
         o3d.visualization.draw_geometries([merge_pointcloud])
         return True
 
