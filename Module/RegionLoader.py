@@ -7,6 +7,7 @@ import numpy as np
 import open3d as o3d
 from tqdm import tqdm
 from plyfile import PlyData
+from multiprocessing import Pool
 
 from Data.Color import COLOR_MAP
 from Data.Object import Object
@@ -49,8 +50,9 @@ class RegionLoader(object):
             return False
         return True
 
-    def loadRegionObject(self, region_file_basename):
-        self.region_object_list_dict[region_file_basename] = []
+    def getRegionObjectList(self, region_file_basename):
+        region_object_list = []
+
         region_file_basepath = \
             self.region_folder_path + region_file_basename
 
@@ -95,7 +97,12 @@ class RegionLoader(object):
             new_object.label = object_label
             new_object.point_array = object_point_array
             new_object.color_array = object_color_array
-            self.region_object_list_dict[region_file_basename].append(new_object)
+            region_object_list.append(new_object)
+        return region_object_list
+
+    def loadRegionObject(self, region_file_basename):
+        region_object_list = self.getRegionObjectList(region_file_basename)
+        self.region_object_list_dict[region_file_basename] = region_object_list
         return True
 
     def loadAllRegionObject(self):
@@ -105,6 +112,27 @@ class RegionLoader(object):
             if not self.loadRegionObject(region_file_basename):
                 print("[ERROR][RegionLoader::loadAllRegionObject]")
                 print("\t loadRegionObject failed!")
+                return False
+        return True
+
+    def loadAllRegionObjectWithPool(self, processes):
+        print("[INFO][RegionLoader::loadAllRegionObjectWithPool]")
+        print("\t start loading objects in all regions...")
+        pool = Pool(processes=processes)
+        region_object_list = pool.map(
+            self.getRegionObjectList, self.region_file_basename_list)
+
+        for i in range(len(region_object_list)):
+            self.region_object_list_dict[self.region_file_basename_list[i]] = \
+                region_object_list[i]
+        return True
+
+    def isLabelValid(self, label):
+        unused_object_label_list = [
+            "floor", "wall", "remove", "window"
+        ]
+        for unused_object_label in unused_object_label_list:
+            if unused_object_label in label:
                 return False
         return True
 
@@ -129,9 +157,6 @@ class RegionLoader(object):
         return True
 
     def visualAllRegionObject(self, use_color_map=True):
-        unused_object_label_list = [
-            "floor", "wall"
-        ]
 
         region_pointcloud_list = []
 
@@ -141,9 +166,12 @@ class RegionLoader(object):
 
             tmp_idx_ = 0
             for region_object in region_object_list:
-                if region_object.label in unused_object_label_list:
+                if not self.isLabelValid(region_object.label):
                     continue
+                print(region_object.label, end=", ")
                 tmp_idx_ += 1
+                if tmp_idx_ % 10 == 0:
+                    print()
                 region_pointcloud = getObjectPointCloud(region_object)
                 if use_color_map:
                     colors = np.zeros(region_object.point_array.shape)
@@ -162,8 +190,8 @@ def demo():
 
     region_loader = RegionLoader()
     region_loader.setRegionPath(region_folder_path)
-    region_loader.loadAllRegionObject()
-    region_loader.visualAllRegionObject()
+    region_loader.loadAllRegionObjectWithPool(12)
+    region_loader.visualAllRegionObject(False)
     return True
 
 if __name__ == "__main__":
