@@ -100,7 +100,8 @@ class HouseLoader(object):
         for house_object in self.house_object_list:
             if not self.isLabelIdxValid(house_object.label_index):
                 continue
-            valid_label_idx_list.append(house_object.label_index)
+            if house_object.label_index not in valid_label_idx_list:
+                valid_label_idx_list.append(house_object.label_index)
             tmp_idx_ += 1
             house_pointcloud = getObjectPointCloud(house_object)
             if use_color_map:
