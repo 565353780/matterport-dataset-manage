@@ -8,7 +8,7 @@ def demo_load_region():
     region_folder_path = \
         "/home/chli/.ros/COSCAN/MatterPort/01/ARNzJeq3xxb/region_segmentations/"
     processes = 12
-    save_folder_path = "/home/chli/.ros/COSCAN/MatterPort/01/objects/"
+    save_folder_path = "/home/chli/.ros/COSCAN/MatterPort/01/region_objects/"
     use_color_map = True
 
     region_loader = RegionLoader()
@@ -21,7 +21,7 @@ def demo_load_region():
 def demo_load_house():
     house_folder_path = \
         "/home/chli/.ros/COSCAN/MatterPort/01/ARNzJeq3xxb/house_segmentations/"
-    save_folder_path = "/home/chli/.ros/COSCAN/MatterPort/01/objects/"
+    save_folder_path = "/home/chli/.ros/COSCAN/MatterPort/01/house_objects/"
     use_color_map = True
 
     house_loader = HouseLoader()
@@ -35,6 +35,6 @@ def demo_load_house():
     return True
 
 if __name__ == "__main__":
-    demo_load_region()
-    #  demo_load_house()
+    #  demo_load_region()
+    demo_load_house()
 

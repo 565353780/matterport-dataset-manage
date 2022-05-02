@@ -124,7 +124,7 @@ class HouseLoader(object):
 def demo():
     house_folder_path = \
         "/home/chli/.ros/COSCAN/MatterPort/01/ARNzJeq3xxb/house_segmentations/"
-    save_folder_path = "/home/chli/.ros/COSCAN/MatterPort/01/objects/"
+    save_folder_path = "/home/chli/.ros/COSCAN/MatterPort/01/house_objects/"
     use_color_map = True
 
     house_loader = HouseLoader()

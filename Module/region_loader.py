@@ -194,7 +194,7 @@ def demo():
     region_folder_path = \
         "/home/chli/.ros/COSCAN/MatterPort/01/ARNzJeq3xxb/region_segmentations/"
     processes = 12
-    save_folder_path = "/home/chli/.ros/COSCAN/MatterPort/01/objects/"
+    save_folder_path = "/home/chli/.ros/COSCAN/MatterPort/01/region_objects/"
     use_color_map = False
 
     region_loader = RegionLoader()
