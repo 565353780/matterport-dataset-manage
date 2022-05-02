@@ -83,6 +83,17 @@ class RegionLoader(object):
         return True
 
     def isLabelValid(self, label):
+        select_valid_label = False
+
+        if select_valid_label:
+            valid_object_label_list = [
+                "chair", "table", "bed"
+            ]
+            for valid_object_label in valid_object_label_list:
+                if valid_object_label in label:
+                    return True
+            return False
+
         unused_object_label_list = [
             "floor", "ceiling", "roof", "wall", "window",
             "door", "gate", "object", "unknown", "remove",
@@ -179,6 +190,7 @@ class RegionLoader(object):
                     region_pointcloud.colors = o3d.utility.Vector3dVector(colors)
                 region_pointcloud_list.append(region_pointcloud)
 
+        valid_label_list.sort()
         print(valid_label_list)
 
         merge_pointcloud = getMergePointCloud(region_pointcloud_list)

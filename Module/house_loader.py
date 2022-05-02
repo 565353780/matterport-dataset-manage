@@ -60,8 +60,18 @@ class HouseLoader(object):
         return True
 
     def isLabelIdxValid(self, label_index):
-        unused_object_label_idx_list = []
-        if label_index in unused_object_label_idx_list:
+        select_valid_label_index = False
+
+        if select_valid_label_index:
+            valid_object_label_index_list = [
+            ]
+            if label_index in valid_object_label_index_list:
+                return True
+            return False
+
+        unused_object_label_index_list = [
+        ]
+        if label_index in unused_object_label_index_list:
             return False
         return True
 

@@ -35,6 +35,6 @@ def demo_load_house():
     return True
 
 if __name__ == "__main__":
-    #  demo_load_region()
-    demo_load_house()
+    demo_load_region()
+    #  demo_load_house()
 
