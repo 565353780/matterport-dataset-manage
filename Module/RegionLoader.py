@@ -129,7 +129,9 @@ class RegionLoader(object):
 
     def isLabelValid(self, label):
         unused_object_label_list = [
-            "floor", "wall", "remove", "window"
+            "floor", "ceiling", "roof", "wall", "window",
+            "door", "gate", "object", "unknown", "remove",
+            "ledge", "countertop"
         ]
         for unused_object_label in unused_object_label_list:
             if unused_object_label in label:
@@ -160,6 +162,8 @@ class RegionLoader(object):
 
         region_pointcloud_list = []
 
+        valid_label_list = []
+
         for region_file_basename in self.region_file_basename_list:
             region_object_list = \
                 self.region_object_list_dict[region_file_basename]
@@ -168,10 +172,9 @@ class RegionLoader(object):
             for region_object in region_object_list:
                 if not self.isLabelValid(region_object.label):
                     continue
-                print(region_object.label, end=", ")
+                if region_object.label not in valid_label_list:
+                    valid_label_list.append(region_object.label)
                 tmp_idx_ += 1
-                if tmp_idx_ % 10 == 0:
-                    print()
                 region_pointcloud = getObjectPointCloud(region_object)
                 if use_color_map:
                     colors = np.zeros(region_object.point_array.shape)
@@ -179,7 +182,13 @@ class RegionLoader(object):
                     region_pointcloud.colors = o3d.utility.Vector3dVector(colors)
                 region_pointcloud_list.append(region_pointcloud)
 
+        print(valid_label_list)
+
         merge_pointcloud = getMergePointCloud(region_pointcloud_list)
+
+        merge_pointcloud.estimate_normals(
+            search_param=o3d.geometry.KDTreeSearchParamHybrid(
+                radius=0.1, max_nn=30))
 
         o3d.visualization.draw_geometries([merge_pointcloud])
         return True
