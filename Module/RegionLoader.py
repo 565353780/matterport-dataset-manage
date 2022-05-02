@@ -196,11 +196,13 @@ class RegionLoader(object):
 def demo():
     region_folder_path = \
         "/home/chli/.ros/COSCAN/MatterPort/01/ARNzJeq3xxb/region_segmentations/"
+    processes = 12
+    use_color_map = False
 
     region_loader = RegionLoader()
     region_loader.setRegionPath(region_folder_path)
-    region_loader.loadAllRegionObjectWithPool(12)
-    region_loader.visualAllRegionObject(False)
+    region_loader.loadAllRegionObjectWithPool(processes)
+    region_loader.visualAllRegionObject(use_color_map)
     return True
 
 if __name__ == "__main__":
