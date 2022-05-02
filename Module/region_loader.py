@@ -82,9 +82,7 @@ class RegionLoader(object):
                 region_object_list[i]
         return True
 
-    def isLabelValid(self, label):
-        select_valid_label = False
-
+    def isLabelValid(self, label, select_valid_label):
         if select_valid_label:
             valid_object_label_list = [
                 "chair", "table", "bed"
@@ -105,7 +103,10 @@ class RegionLoader(object):
                 return False
         return True
 
-    def saveRegionObjectPointCloud(self, save_folder_path, region_file_basename):
+    def saveRegionObjectPointCloud(self,
+                                   save_folder_path,
+                                   region_file_basename,
+                                   select_valid_label):
         if save_folder_path[-1] != "/":
             save_folder_path += "/"
 
@@ -121,7 +122,8 @@ class RegionLoader(object):
 
         for i in range(len(region_pointcloud_list)):
             region_pointcloud_label = region_object_list[i].label
-            if not self.isLabelValid(region_pointcloud_label):
+            if not self.isLabelValid(region_pointcloud_label,
+                                     select_valid_label):
                 continue
             region_pointcloud = region_pointcloud_list[i]
             region_pointcloud_save_filename = region_file_basename + "_" + \
@@ -132,7 +134,9 @@ class RegionLoader(object):
                 write_ascii=True)
         return True
 
-    def saveAllRegionObjectPointCloud(self, save_folder_path):
+    def saveAllRegionObjectPointCloud(self,
+                                      save_folder_path,
+                                      select_valid_label):
         if save_folder_path[-1] != "/":
             save_folder_path += "/"
 
@@ -141,19 +145,26 @@ class RegionLoader(object):
 
         for region_file_basename in self.region_file_basename_list:
             if not self.saveRegionObjectPointCloud(save_folder_path,
-                                                   region_file_basename):
+                                                   region_file_basename,
+                                                   select_valid_label):
                 print("[ERROR][RegionLoader::saveAllRegionObjectPointCloud]")
                 print("\t saveRegionObjectPointCloud failed!")
                 return False
         return True
 
-    def visualRegionObject(self, region_file_basename, use_color_map=True):
+    def visualRegionObject(self,
+                           region_file_basename,
+                           use_color_map,
+                           select_valid_label):
         region_object_list = \
             self.region_object_list_dict[region_file_basename]
 
         region_pointcloud_list = []
         tmp_idx_ = 0
         for region_object in region_object_list:
+            if not self.isLabelValid(region_object.label,
+                                     select_valid_label):
+                continue
             tmp_idx_ += 1
             region_pointcloud = getObjectPointCloud(region_object)
             if use_color_map:
@@ -167,7 +178,9 @@ class RegionLoader(object):
         o3d.visualization.draw_geometries([merge_pointcloud])
         return True
 
-    def visualAllRegionObject(self, use_color_map=True):
+    def visualAllRegionObject(self,
+                              use_color_map,
+                              select_valid_label):
         region_pointcloud_list = []
 
         valid_label_list = []
@@ -178,7 +191,8 @@ class RegionLoader(object):
 
             tmp_idx_ = 0
             for region_object in region_object_list:
-                if not self.isLabelValid(region_object.label):
+                if not self.isLabelValid(region_object.label,
+                                         select_valid_label):
                     continue
                 if region_object.label not in valid_label_list:
                     valid_label_list.append(region_object.label)
@@ -207,13 +221,14 @@ def demo():
         "/home/chli/.ros/COSCAN/MatterPort/01/ARNzJeq3xxb/region_segmentations/"
     processes = 12
     save_folder_path = "/home/chli/.ros/COSCAN/MatterPort/01/region_objects/"
-    use_color_map = False
+    select_valid_label = False
+    use_color_map = True
 
     region_loader = RegionLoader()
     region_loader.setRegionPath(region_folder_path)
     region_loader.loadAllRegionObjectWithPool(processes)
-    region_loader.saveAllRegionObjectPointCloud(save_folder_path)
-    region_loader.visualAllRegionObject(use_color_map)
+    region_loader.saveAllRegionObjectPointCloud(save_folder_path, select_valid_label)
+    region_loader.visualAllRegionObject(use_color_map, select_valid_label)
     return True
 
 if __name__ == "__main__":

@@ -59,9 +59,7 @@ class HouseLoader(object):
         self.house_object_list = self.getHouseObjectList()
         return True
 
-    def isLabelIdxValid(self, label_index):
-        select_valid_label_index = False
-
+    def isLabelIdxValid(self, label_index, select_valid_label_index):
         if select_valid_label_index:
             valid_object_label_index_list = [
             ]
@@ -75,7 +73,9 @@ class HouseLoader(object):
             return False
         return True
 
-    def saveHouseObjectPointCloud(self, save_folder_path):
+    def saveHouseObjectPointCloud(self,
+                                  save_folder_path,
+                                  select_valid_label_index):
         if save_folder_path[-1] != "/":
             save_folder_path += "/"
 
@@ -90,7 +90,8 @@ class HouseLoader(object):
 
         for i in range(len(house_pointcloud_list)):
             house_pointcloud_label_idx = house_object_list[i].label_index
-            if not self.isLabelIdxValid(house_pointcloud_label_idx):
+            if not self.isLabelIdxValid(house_pointcloud_label_idx,
+                                        select_valid_label_index):
                 continue
             house_pointcloud = house_pointcloud_list[i]
             house_pointcloud_save_filename = "house_" + \
@@ -101,14 +102,15 @@ class HouseLoader(object):
                 write_ascii=True)
         return True
 
-    def visualHouseObject(self, use_color_map=True):
+    def visualHouseObject(self, use_color_map, select_valid_label_index):
         house_pointcloud_list = []
 
         valid_label_idx_list = []
 
         tmp_idx_ = 0
         for house_object in self.house_object_list:
-            if not self.isLabelIdxValid(house_object.label_index):
+            if not self.isLabelIdxValid(house_object.label_index,
+                                        select_valid_label_index):
                 continue
             if house_object.label_index not in valid_label_idx_list:
                 valid_label_idx_list.append(house_object.label_index)
@@ -136,13 +138,14 @@ def demo():
     house_folder_path = \
         "/home/chli/.ros/COSCAN/MatterPort/01/ARNzJeq3xxb/house_segmentations/"
     save_folder_path = "/home/chli/.ros/COSCAN/MatterPort/01/house_objects/"
+    select_valid_label_index = False
     use_color_map = True
 
     house_loader = HouseLoader()
     house_loader.setHousePath(house_folder_path)
     house_loader.loadHouseObject()
-    house_loader.saveHouseObjectPointCloud(save_folder_path)
-    house_loader.visualHouseObject(use_color_map)
+    house_loader.saveHouseObjectPointCloud(save_folder_path, select_valid_label_index)
+    house_loader.visualHouseObject(use_color_map, select_valid_label_index)
     return True
 
 if __name__ == "__main__":
