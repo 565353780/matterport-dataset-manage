@@ -200,7 +200,7 @@ def demo():
     region_loader = RegionLoader()
     region_loader.setRegionPath(region_folder_path)
     region_loader.loadAllRegionObjectWithPool(processes)
-    #  region_loader.saveAllRegionObjectPointCloud(save_folder_path)
+    region_loader.saveAllRegionObjectPointCloud(save_folder_path)
     region_loader.visualAllRegionObject(use_color_map)
     return True
 

@@ -110,6 +110,7 @@ class HouseLoader(object):
                 house_pointcloud.colors = o3d.utility.Vector3dVector(colors)
             house_pointcloud_list.append(house_pointcloud)
 
+        valid_label_idx_list.sort()
         print(valid_label_idx_list)
 
         merge_pointcloud = getMergePointCloud(house_pointcloud_list)
@@ -130,7 +131,7 @@ def demo():
     house_loader = HouseLoader()
     house_loader.setHousePath(house_folder_path)
     house_loader.loadHouseObject()
-    #  house_loader.saveHouseObjectPointCloud(save_folder_path)
+    house_loader.saveHouseObjectPointCloud(save_folder_path)
     house_loader.visualHouseObject(use_color_map)
     return True
 
