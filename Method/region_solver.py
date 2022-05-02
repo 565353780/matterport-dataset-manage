@@ -39,7 +39,7 @@ def getRegionObjectList(region_file_basepath):
     with open(semseg_file_path, "r") as f:
         semseg_json = json.load(f)
     for seg_group in semseg_json["segGroups"]:
-        object_label = seg_group["label"]
+        object_label = seg_group["label"].replace("/", " ")
 
         object_seg_array = np.array(seg_group["segments"])
         object_point_idx_array = \

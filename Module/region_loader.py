@@ -93,6 +93,46 @@ class RegionLoader(object):
                 return False
         return True
 
+    def saveRegionObjectPointCloud(self, save_folder_path, region_file_basename):
+        if save_folder_path[-1] != "/":
+            save_folder_path += "/"
+
+        if not os.path.exists(save_folder_path):
+            os.makedirs(save_folder_path)
+
+        region_object_list = self.region_object_list_dict[region_file_basename]
+        region_pointcloud_list = []
+
+        for region_object in region_object_list:
+            region_pointcloud = getObjectPointCloud(region_object)
+            region_pointcloud_list.append(region_pointcloud)
+
+        for i in range(len(region_pointcloud_list)):
+            region_pointcloud_label = region_object_list[i].label
+            region_pointcloud = region_pointcloud_list[i]
+            region_pointcloud_save_filename = region_file_basename + "_" + \
+                str(i) + "_" + region_pointcloud_label + ".ply"
+            o3d.io.write_point_cloud(
+                save_folder_path + region_pointcloud_save_filename,
+                region_pointcloud,
+                write_ascii=True)
+        return True
+
+    def saveAllRegionObjectPointCloud(self, save_folder_path):
+        if save_folder_path[-1] != "/":
+            save_folder_path += "/"
+
+        if not os.path.exists(save_folder_path):
+            os.makedirs(save_folder_path)
+
+        for region_file_basename in self.region_file_basename_list:
+            if not self.saveRegionObjectPointCloud(save_folder_path,
+                                                   region_file_basename):
+                print("[ERROR][RegionLoader::saveAllRegionObjectPointCloud]")
+                print("\t saveRegionObjectPointCloud failed!")
+                return False
+        return True
+
     def visualRegionObject(self, region_file_basename, use_color_map=True):
         region_object_list = \
             self.region_object_list_dict[region_file_basename]
@@ -114,7 +154,6 @@ class RegionLoader(object):
         return True
 
     def visualAllRegionObject(self, use_color_map=True):
-
         region_pointcloud_list = []
 
         valid_label_list = []
@@ -152,11 +191,13 @@ def demo():
     region_folder_path = \
         "/home/chli/.ros/COSCAN/MatterPort/01/ARNzJeq3xxb/region_segmentations/"
     processes = 12
+    save_folder_path = "/home/chli/.ros/COSCAN/MatterPort/01/objects/"
     use_color_map = False
 
     region_loader = RegionLoader()
     region_loader.setRegionPath(region_folder_path)
     region_loader.loadAllRegionObjectWithPool(processes)
+    region_loader.saveAllRegionObjectPointCloud(save_folder_path)
     region_loader.visualAllRegionObject(use_color_map)
     return True
 
