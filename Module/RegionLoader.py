@@ -162,10 +162,6 @@ def demo():
 
     region_loader = RegionLoader()
     region_loader.setRegionPath(region_folder_path)
-    region_loader.loadRegionObject(region_loader.region_file_basename_list[0])
-    region_loader.visualRegionObject(region_loader.region_file_basename_list[0])
-    exit()
-
     region_loader.loadAllRegionObject()
     region_loader.visualAllRegionObject()
     return True
